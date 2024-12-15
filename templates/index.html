@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contamination Level Detector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        #upload-section, #result-section {
+            display: block;
+        }
+        #result-section {
+            display: none;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .btn-reset {
+            background-color: #f44336;
+        }
+        .btn-reset:hover {
+            background-color: #e53935;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Contamination Level Detector</h1>
+    
+    <!-- Upload Section -->
+    <div id="upload-section">
+        <h3>Upload an Image</h3>
+        <input type="file" id="imageUpload" accept="image/*">
+        <br><br>
+        <button class="btn" onclick="processImage()">Detect Contamination Level</button>
+    </div>
+    
+    <!-- Result Section -->
+    <div id="result-section">
+        <h3>Contamination Level Result</h3>
+        <p id="contaminationLevel">Contamination Level: <strong>Loading...</strong></p>
+        <p id="closestBin">Closest Bin: <strong>Loading...</strong></p>
+        <h4>Contamination Level Plot</h4>
+        <img id="contaminationPlot" src="" alt="Contamination Plot" style="max-width: 100%; height: auto;">
+        <br><br>
+    </div>
+</div>
+
+<script>
+    function processImage() {
+        const fileInput = document.getElementById('imageUpload');
+        const formData = new FormData();
+        formData.append('imageUpload', fileInput.files[0]);
+
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            const contaminationLevel = data.contaminationLevel;
+            const closestBin = data.closestBin;
+            const plotImage = data.plotImage;
+
+            document.getElementById('contaminationLevel').innerHTML = `Contamination Level: <strong>${contaminationLevel}</strong>`;
+            document.getElementById('closestBin').innerHTML = `Closest Bin: <strong>${closestBin}</strong>`;
+            document.getElementById('contaminationPlot').src = plotImage;
+
+            document.getElementById('upload-section').style.display = 'none';
+            document.getElementById('result-section').style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    function resetPage() {
+        document.getElementById('upload-section').style.display = 'block';
+        document.getElementById('result-section').style.display = 'none';
+        document.getElementById('imageUpload').value = ''; // Clear file input
+    }
+</script>
+
+</body>
+</html>
